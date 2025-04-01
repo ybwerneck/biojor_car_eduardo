@@ -1,6 +1,7 @@
 import geopandas as gpd
 
 def find_intersections(gdf, ucs, min_area=0.0001):
+#    print(gdf)
     """
     Finds intersections between two GeoDataFrames (gdf and ucs) using spatial indexes
     and returns a GeoDataFrame containing the intersection geometries.
@@ -24,10 +25,10 @@ def find_intersections(gdf, ucs, min_area=0.0001):
     for ucs_idx, ucs_geom in ucs.geometry.items():
         # Find possible matches within the UC's bounding box
         possible_matches = list(gdf_sindex.intersection(ucs_geom.bounds))
-        
+
         for prop_idx in possible_matches:
             prop_geom = gdf.geometry.iloc[prop_idx]
-            
+            #print(gdf.iloc[prop_idx])
             # Check for intersection
             if ucs_geom.intersects(prop_geom):
                 intersection = ucs_geom.intersection(prop_geom)
@@ -35,8 +36,8 @@ def find_intersections(gdf, ucs, min_area=0.0001):
                 # Verify intersection area exceeds threshold
                 if not intersection.is_empty and intersection.area >= min_area:
                     intersection_data.append({
-                        "property_id": gdf.index[prop_idx],
-                        "uc_id": ucs.index[ucs_idx],
+                        "property_id": gdf.iloc[prop_idx]["cod_imovel"],
+                        "uc_id": ucs.iloc[ucs_idx]["id"],
                         "intersection_area": intersection.area,
                         "geometry": intersection
                     })

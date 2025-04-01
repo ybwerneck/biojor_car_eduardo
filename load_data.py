@@ -15,6 +15,7 @@ class GeoDataLoader:
         :param filepath: Path to the shapefile
         :return: A cleaned GeoDataFrame
         """
+        crs_proj = 'EPSG:32723'
         try:
             gdf = gpd.read_file(filepath)
             # Remove empty geometries
@@ -23,6 +24,7 @@ class GeoDataLoader:
             gdf = gdf[gdf.notna()]
             # Remove invalid geometries
             gdf = gdf[gdf.is_valid]
+          #  gdf=gdf.to_crs(crs_proj)
             return gdf
         except Exception as e:
             print(f"Error loading or cleaning file {filepath}: {e}")
@@ -42,6 +44,7 @@ class GeoDataLoader:
             gdf = GeoDataLoader.load_and_clean(path)
             if gdf is not None:
                 data[label] = gdf
+            #print(gdf)
         return data
 
 # Rodr o main para baixar
