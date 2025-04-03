@@ -27,7 +27,7 @@ q_is = np.array(list(arquivos.keys()))[3:]  # Convertendo as chaves para um arra
 print(q_is)
 #car['area_rural'] = car.geometry.area
 # Plotando (se definido como True)
-plotar=False
+plotar=True
 
 
 import pandas as pd

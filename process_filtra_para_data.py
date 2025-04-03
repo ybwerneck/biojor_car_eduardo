@@ -19,7 +19,7 @@ def filter_and_save_to_para(datasets, uf_gdf, base_input_folder, target_folder_k
         if gdf is not None:
             print(f"Filtering {label} for geometries within PARA...")
             # Perform the spatial filter
-            filtered_gdf = gdf[gdf.geometry.within(para_boundary)]
+            filtered_gdf = gdf[gdf.geometry.intersects(para_boundary)]
             
             if not filtered_gdf.empty:
                 # Replace the keyword in the file path
