@@ -9,7 +9,7 @@ def read_csv_files(file1, file2, file3):
 
 def filter_top_categories(df_cat):
     df_cat["Percentual sobreposto"] = df_cat["Percentual sobreposto"].round(4)
-    df_cat = df_cat.sort_values(by=["Área sobreposta com CAR"], ascending=[False])
+    df_cat = df_cat.sort_values(by=["Percentual sobreposto"], ascending=[False])
 
     top_ucs = df_cat[df_cat["Dataset"] == "UCs"]
     top_asse = df_cat[df_cat["Dataset"] == "Assen."]
@@ -39,34 +39,42 @@ def filter_top_categories(df_cat):
 
 
 def filter_top_cars(df_car):
-    df_car_ucs = df_car[['CAR','cond','cidade','Área_Total','Área CAR sob UCs','PC CAR sob UCs']]
-    df_car_tis = df_car[['CAR','cond','cidade','Área_Total','Área CAR sob TIs','PC CAR sob TIs']]
-    df_car_asse = df_car[['CAR','cond','cidade','Área_Total','Área CAR sob Assen.','PC CAR sob Assen.']]
-    df_car_qui = df_car[['CAR','cond','cidade','Área_Total','Área CAR sob Quil.','PC CAR sob Quil.']]
+    # Get the unique conditions
+    unique_conds = df_car['cond'].unique()
 
-    df_car_ucs = df_car_ucs.sort_values(by=["Área CAR sob UCs"], ascending=[False])
-    df_car_tis = df_car_tis.sort_values(by=["Área CAR sob TIs"], ascending=[False])
-    df_car_asse = df_car_asse.sort_values(by=["Área CAR sob Assen."], ascending=[False])
-    df_car_qui = df_car_qui.sort_values(by=["Área CAR sob Quil."], ascending=[False])
+    # Loop through each condition
+    for cond in unique_conds:
+        df_cond = df_car[df_car['cond'] == cond]  # Filter by current condition
 
-    df_car_ucs=df_car_ucs.head(10)
-    df_car_tis=df_car_tis.head(10)
-    df_car_asse=df_car_asse.head(10)
-    df_car_qui=df_car_qui.head(10)
+        # Create the filtered DataFrames
+        df_car_ucs = df_cond[['CAR','cond','cidade','Área_Total','Área CAR sob UCs','PC CAR sob UCs']]
+        df_car_tis = df_cond[['CAR','cond','cidade','Área_Total','Área CAR sob TIs','PC CAR sob TIs']]
+        df_car_asse = df_cond[['CAR','cond','cidade','Área_Total','Área CAR sob Assen.','PC CAR sob Assen.']]
+        df_car_qui = df_cond[['CAR','cond','cidade','Área_Total','Área CAR sob Quil.','PC CAR sob Quil.']]
 
-    print("Top CARs que mais sobrepõem UCs:")
-    print(df_car_ucs)
-    print("Top CARs que mais sobrepõem TIs:")
-    print(df_car_tis)
-    print("Top CARs que mais sobrepõem Assentamentos:")
-    print(df_car_asse)
-    print("Top CARs que mais sobrepõem Quilombolas:")
-    print(df_car_qui)
+        # Sort and get top 10 for each category
+        df_car_ucs = df_car_ucs.sort_values(by=["Área CAR sob UCs"], ascending=False).head(10)
+        df_car_tis = df_car_tis.sort_values(by=["Área CAR sob TIs"], ascending=False).head(10)
+        df_car_asse = df_car_asse.sort_values(by=["Área CAR sob Assen."], ascending=False).head(10)
+        df_car_qui = df_car_qui.sort_values(by=["Área CAR sob Quil."], ascending=False).head(10)
 
-    df_car_ucs.to_csv("./Resultados_Visualização/CARs/top_cars_ucs.csv")
-    df_car_tis.to_csv("./Resultados_Visualização/CARs/top_cars_tis.csv")
-    df_car_asse.to_csv("./Resultados_Visualização/CARs/top_cars_assentamentos.csv")
-    df_car_qui.to_csv("./Resultados_Visualização/CARs/top_cars_quilombos.csv")
+        # Print the results for each condition
+        print(f"Top CARs for condition: {cond}")
+        print("Top CARs que mais sobrepõem UCs:")
+        print(df_car_ucs)
+        print("Top CARs que mais sobrepõem TIs:")
+        print(df_car_tis)
+        print("Top CARs que mais sobrepõem Assentamentos:")
+        print(df_car_asse)
+        print("Top CARs que mais sobrepõem Quilombolas:")
+        print(df_car_qui)
+
+        # Save the results to CSV for each condition
+        cond=cond[0:17]
+        df_car_ucs.to_csv(f"./Resultados_Visualização/CARs/top_cars_ucs_{cond}.csv")
+        df_car_tis.to_csv(f"./Resultados_Visualização/CARs/top_cars_tis_{cond}.csv")
+        df_car_asse.to_csv(f"./Resultados_Visualização/CARs/top_cars_assentamentos_{cond}.csv")
+        df_car_qui.to_csv(f"./Resultados_Visualização/CARs/top_cars_quilombos_{cond}.csv")
 
 def filter_top_cities(df_cid):
 

@@ -6,21 +6,29 @@ import numpy as np
 import matplotlib.patches as mpatches
 import pandas as pd
 # Carregar o arquivo shapefile
-
+import os
 arquivos = {
         "car": "dados/PARA/CAR/AREA_IMOVEL_1.shp",
         "municipios": "dados/PARA/Municipios/PA_Municipios_2023.shp",
         "uf": "dados/PARA/UF/PA_UF_2023.shp",
+                "UCs": "dados/PARA/UCs/cat60_protected_area_WGS84_v2.shp",
+
         "Assen.": "dados/PARA/Assentamentos/cat63_settlements_WGS84.shp",
-       # "fpnds": "dados/PARA/FPND/florestas_publicas_naodestinadas.shp",
         "Quil.": "dados/PARA/Quilombolas/cat62_quilombola_WGS84.shp",
+       
+       
+       # "Agua": "dados/PARA/Agua/geoft_bho_massa_dagua_v2019.shp",
+    
         "TIs": "dados/PARA/TIs/cat61_indigenous_territories_WGS84.shp",
-        "UCs": "dados/PARA/UCs/cat60_protected_area_WGS84_v2.shp",
 }
 datasets = GeoDataLoader().load_all(arquivos)
 uf = datasets.get("uf")
 municipios = datasets.get("municipios")
 car = datasets.get("car")
+print(car.columns)
+print(car["des_condic"].head())
+#car = car[car['des_condic'].str.startswith("Analisado sem")]
+
 
 print(car)
 q_is = np.array(list(arquivos.keys()))[3:]  # Convertendo as chaves para um array
@@ -47,19 +55,33 @@ from shapely.ops import unary_union
 
 for dset in q_is:
     print(f"Processando dataset: {dset}")
+    print(datasets[dset].columns)
     
+    print(datasets[dset].head())
     # Encontrar interseções já calculadas
-    intersect[dset] = find_intersections(car, datasets[dset])
+   # print(car)
+    print(datasets[dset].head())
+    try:
+        intersect[dset] = find_intersections(car, datasets[dset])
+    except:
+        print(f"Erro ao encontrar interseções para {dset}.")
+        continue
     intersect[dset]['overlap_area'] = intersect[dset]['intersection_area']
     
-#    print(intersect[dset].head())
+
     
     
+    os.makedirs(f'Resultados/{dset}_intersect/', exist_ok=True)
+    intersect[dset].to_file(f'Resultados/{dset}_intersect/shapes_intersect.shp')
+            
     # Criar dicionário para armazenar resultados agregados por property_id
 
      
     for idx, row in datasets[dset].iterrows():
-        uc__id=row["id"]
+        try:
+            uc__id=row["id"]
+        except:
+            uc__id=row["gid"]
        # print(row)
         intersects = intersect[dset][intersect[dset]['uc_id'] == row["id"]]
 
@@ -97,8 +119,8 @@ i=0
 
 
 
-cores = ["blue", "yellow", "orange", "pink", "purple"]
-plotar=False
+cores = ["blue", "yellow", "orange"]
+plotar=True
     
 if plotar:
     for dset in q_is:
@@ -114,18 +136,18 @@ if plotar:
         i += 1
         print(i)
 
-        car_plot_obj = car.plot(ax=ax, color='green', edgecolor='black', linewidth=0.001, alpha=0.1)
+        car_plot_obj = car.plot(ax=ax, color='green', edgecolor='black', linewidth=0.00001, alpha=0.1)
         car_proxy = mpatches.Patch(color='green', label='car')
         proxy_artists.append(car_proxy)
 
-        i_obj = intersect[dset].plot(ax=ax, color='red', edgecolor='black', linewidth=0.001, alpha=0.4)
+        i_obj = intersect[dset].plot(ax=ax, color='red', edgecolor='black', linewidth=0.0001, alpha=0.4)
         i_proxy = mpatches.Patch(color='red', label='interseções')
         proxy_artists.append(i_proxy)
 
         ax.legend(handles=proxy_artists)
         plt.tight_layout()
 
-        plt.savefig(f"Resultados/plot_{dset}.png", bbox_inches='tight')
+        plt.savefig(f"Resultados/{dset}_intersect/plot_{dset}.png", bbox_inches='tight')
 
 if(plotar):
 
@@ -133,7 +155,7 @@ if(plotar):
     fig, ax = plt.subplots(figsize=(30, 16), dpi=100)
 
     uf.plot(ax=ax, color='white', edgecolor='black', linewidth=1, alpha=1, figsize=(25, 12))
-    municipios.plot(ax=ax, color='white', edgecolor='black', linewidth=0.2, alpha=1, figsize=(30, 16))
+    municipios.plot(ax=ax, color='white', edgecolor='black', linewidth=0.02, alpha=1, figsize=(30, 16))
 
     i = 0
 
@@ -152,7 +174,7 @@ if(plotar):
         i += 1
 
     # Plotar o dataset 'car' com sua própria legenda
-    car_plot_obj = car.plot(ax=ax, color='green', edgecolor='black', linewidth=0.001, alpha=0.1)
+    car_plot_obj = car.plot(ax=ax, color='green', edgecolor='black', linewidth=0.0001, alpha=0.2)
 
     # Criar um "proxy artist" para 'Car Data'
     car_proxy = mpatches.Patch(color='green', label='car')
@@ -165,7 +187,7 @@ if(plotar):
     plt.tight_layout()
 
     # Salvar o gráfico em um arquivo
-    plt.savefig("Resultados/plot_all.pdf", bbox_inches='tight')  # Garante que a legenda não será cortada
+    plt.savefig("Resultados/plot_all.png", bbox_inches='tight')  # Garante que a legenda não será cortada
 
     # Opcionalmente, você pode exibir o gráfico (se estiver rodando em um ambiente interativo)
     # plt.show()

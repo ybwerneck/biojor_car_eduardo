@@ -50,10 +50,8 @@ class GeoDataLoader:
 # Rodr o main para baixar
 if __name__ == "__main__":
     files = {
-        "imov": "PARA/imov/AREA_IMOVEL_1.shp",
-        "municipios": "PARA/municipios/PA_Municipios_2023.shp",
-        "uf": "PARA/PA_UF_2023/PA_UF_2023.shp",
-        "ucs": "UCs/lim_unidade_protecao_integral_a.shp"
+        "imov": "dados/PARA/CAR/AREA_IMOVEL_1.shp",
+
     }
 
     datasets = GeoDataLoader().load_all(files)
