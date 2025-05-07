@@ -42,6 +42,33 @@ class GeoDataLoader:
         for label, path in files.items():
             print(f"Loading {label} from {path}...")
             gdf = GeoDataLoader.load_and_clean(path)
+            
+            
+            
+            
+            
+            
+            if "codigo" in gdf.columns:
+            # Rename the column 'codigo' to 'id'
+                gdf.rename(columns={"codigo": "id"}, inplace=True)
+                print("'codigo' column has been renamed to 'id'.")
+            else:
+                print("No 'codigo' column found in the shapefile.")
+            
+                        
+            if "nome" in gdf.columns:
+            # Rename the column 'codigo' to 'id'
+                gdf.rename(columns={"nome": "name"}, inplace=True)
+                print("'codigo' column has been renamed to 'id'.")
+            else:
+                print("No 'codigo' column found in the shapefile.")
+            
+            
+            
+            
+            
+            
+            
             if gdf is not None:
                 data[label] = gdf
             #print(gdf)

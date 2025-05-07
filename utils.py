@@ -28,12 +28,10 @@ def find_intersections(gdf, ucs, min_area=0.0001):
     
     # List to store intersection results
     intersection_data = []
-    
     # Iterate over UCs to find overlapping properties
     for ucs_idx, ucs_geom in ucs.geometry.items():
         # Find possible matches within the UC's bounding box using the spatial index
         possible_matches = list(gdf_sindex.intersection(ucs_geom.bounds))
-        
         # Iterate through possible matches and check if there is an actual intersection
         for prop_idx in possible_matches:
             prop_geom = gdf.geometry.iloc[prop_idx]
@@ -41,16 +39,19 @@ def find_intersections(gdf, ucs, min_area=0.0001):
             # Check if there is an intersection using the `intersects()` method
             if ucs_geom.intersects(prop_geom):
                 intersection = ucs_geom.intersection(prop_geom)
-                
-                # Check if the intersection is valid and meets the minimum area threshold
-                if not intersection.is_empty and intersection.area >= min_area:
-                    intersection_data.append({
-                        "property_id": gdf.iloc[prop_idx]["cod_imovel"],
-                        "uc_id": ucs.iloc[ucs_idx]["id"] if "id" in ucs.columns else ucs.iloc[ucs_idx]["FID"],
-                        "intersection_area": intersection.area,
-                        "geometry": intersection
-                    })
-    
+            #    print(ucs_idx)
+                try:
+                    # Check if the intersection is valid and meets the minimum area threshold
+                    if not intersection.is_empty and intersection.area >= min_area:
+                        intersection_data.append({
+                            "property_id": gdf.iloc[prop_idx]["cod_imovel"],
+                            "uc_id": ucs.iloc[ucs_idx]["id"] if "id" in ucs.columns else ucs.iloc[ucs_idx]["FID"] if "FID" in ucs.columns else ucs_idx,
+                            "intersection_area": intersection.area,
+                            "geometry": intersection
+                        })
+                except Exception as e:
+                    continue
+        
     # Create a GeoDataFrame for intersections
     intersecting_gdf = gpd.GeoDataFrame(intersection_data, geometry="geometry", crs=gdf.crs)
     

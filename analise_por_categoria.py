@@ -11,11 +11,12 @@ arquivos = {
         "car": "dados/PARA/CAR/AREA_IMOVEL_1.shp",
         "municipios": "dados/PARA/Municipios/PA_Municipios_2023.shp",
         "uf": "dados/PARA/UF/PA_UF_2023.shp",
+        "FPND":"dados/PARA/FPND/CNFP_2022_PA.shp",
+
                 "UCs": "dados/PARA/UCs/cat60_protected_area_WGS84_v2.shp",
 
         "Assen.": "dados/PARA/Assentamentos/cat63_settlements_WGS84.shp",
         "Quil.": "dados/PARA/Quilombolas/cat62_quilombola_WGS84.shp",
-       
        
        # "Agua": "dados/PARA/Agua/geoft_bho_massa_dagua_v2019.shp",
     
@@ -61,9 +62,9 @@ for dset in q_is:
     # Encontrar interseções já calculadas
    # print(car)
     print(datasets[dset].head())
-    try:
+    if(True):
         intersect[dset] = find_intersections(car, datasets[dset])
-    except:
+    else:
         print(f"Erro ao encontrar interseções para {dset}.")
         continue
     intersect[dset]['overlap_area'] = intersect[dset]['intersection_area']
@@ -98,7 +99,7 @@ for dset in q_is:
         #print(intersect)
         resultados_categoria[uc__id] = {
                 "Dataset": dset,
-                "Nome":row["name"],
+                "Nome":row["name"] ,
                 "unit_id": uc__id,
                 "Área_Total": row.geometry.area*111*110.8,
                 "Área sobreposta com CAR": a,
@@ -119,7 +120,7 @@ i=0
 
 
 
-cores = ["blue", "yellow", "orange"]
+cores = ["blue", "yellow", "orange","purple","blue"]
 plotar=True
     
 if plotar:
